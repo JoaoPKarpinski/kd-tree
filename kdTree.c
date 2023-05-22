@@ -6,10 +6,10 @@ int compara(int a, int b){
     return a < b;
 }
 
-coord constr(int x, int y){
-    coord cordenada;
-    cordenada.x = x;
-    cordenada.y = y;
+coord* constr(int x, int y){
+    coord* cordenada = (coord*)malloc(sizeof(coord));
+    cordenada->x = x;
+    cordenada->y = y;
 
     return cordenada;
 }
@@ -64,30 +64,59 @@ void abb_inserir(tarv * parv, void *pitem){
 
 
 
+void remover(tno** pPno){
+    tno* aux;
+    if(*pPno != NULL){
+        if((*pPno)->dir == NULL && (*pPno)->esq == NULL){
+            free((*pPno)->item);
+            free(*pPno);
+            *pPno = NULL;
+        } else if((*pPno)->dir == NULL && (*pPno)->esq != NULL){
+            aux = *pPno;
+            free((*pPno)->item);
+            *pPno = (*pPno)->esq;
+            free(aux);
+        } else if((*pPno)->esq == NULL && (*pPno)->dir != NULL){
+            aux = *pPno;
+            free((*pPno)->item);
+            *pPno = (*pPno)->dir;
+            free(aux);
+        } else {
+            tno* suc = (*pPno)->dir;
+            tno** psuc = &(*pPno)->dir;
+            while(suc->esq != NULL){
+                psuc = &suc->esq;
+                suc = suc->esq;
+            }
+            free((*pPno)->item);
+            (*pPno)->item = suc->item;
+            *psuc = suc->dir;
+            free(suc); 
+        }
+    }
+}
+
 int main(){
     tarv arv;
     abb_construir(&arv, compara);
 
-    coord c1 = constr(40, 45);
+    abb_inserir(&arv, constr(40, 45)); //raiz
 
-    abb_inserir(&arv, &c1);
+    abb_inserir(&arv, constr(15, 70)); //esq
 
+    abb_inserir(&arv, constr(70, 10)); //dir
 
-    coord c2 = constr(15, 70);
+    abb_inserir(&arv, (constr(69, 50))); //dir
+    
+    abb_inserir(&arv, (constr(55, 80))); //esq
+    
+    abb_inserir(&arv, (constr(69, 120))); //dir
 
-    abb_inserir(&arv, &c2);
+    tno** raiz = &arv.raiz; 
 
+    remover(raiz);
 
-    coord c3 = constr(70, 10);
-
-    abb_inserir(&arv, &c3);
-
-
-    coord c4 = constr(69, 50);
-
-    abb_inserir(&arv, &c4);
-
-    printf("%d - x\n", ((coord*)arv.raiz->dir->dir->item)->x);
+    printf("%d - x\n", ((coord*)arv.raiz->dir->item)->x);
 
     return 0;
 }
