@@ -9,6 +9,7 @@ typedef struct _no{
 }tno;
 
 typedef struct _coord{
+    //inserir informacoes da implementação específica
     int x;
     int y;
 }coord;
